@@ -2,6 +2,19 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-nativ
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Svg, { Circle, Polyline } from 'react-native-svg';
+
+function Logo() {
+  return (
+    <Svg width="80" height="80" viewBox="0 0 160 160">
+      <Circle cx="80" cy="80" r="70" fill="none" stroke="#1D9E75" strokeWidth="1" opacity="0.15"/>
+      <Circle cx="80" cy="80" r="56" fill="none" stroke="#1D9E75" strokeWidth="1.5" opacity="0.3"/>
+      <Circle cx="80" cy="80" r="42" fill="none" stroke="#1D9E75" strokeWidth="2" opacity="0.5"/>
+      <Circle cx="80" cy="80" r="32" fill="#1D9E75"/>
+      <Polyline points="64,82 72,92 96,66" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+    </Svg>
+  );
+}
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -38,6 +51,11 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.logoWrap}>
+        <Logo />
+        <Text style={styles.logoText}>ALERTKIND</Text>
+      </View>
+
       <Text style={styles.title}>Welcome back</Text>
       <Text style={styles.subtitle}>Enter your email to continue</Text>
 
@@ -66,6 +84,8 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0a0a14', padding: 28, justifyContent: 'center' },
+  logoWrap: { alignItems: 'center', marginBottom: 40 },
+  logoText: { color: '#1D9E75', fontSize: 18, fontWeight: '700', letterSpacing: 4, marginTop: 10 },
   title: { fontSize: 28, fontWeight: '700', color: 'white', marginBottom: 8 },
   subtitle: { fontSize: 14, color: '#666', marginBottom: 40, lineHeight: 22 },
   input: { backgroundColor: '#141420', borderWidth: 1, borderColor: '#222', borderRadius: 12, padding: 14, color: 'white', fontSize: 15, marginBottom: 16 },

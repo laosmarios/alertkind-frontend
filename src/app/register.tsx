@@ -2,6 +2,19 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Svg, { Circle, Polyline } from 'react-native-svg';
+
+function Logo() {
+  return (
+    <Svg width="60" height="60" viewBox="0 0 160 160">
+      <Circle cx="80" cy="80" r="70" fill="none" stroke="#1D9E75" strokeWidth="1" opacity="0.15"/>
+      <Circle cx="80" cy="80" r="56" fill="none" stroke="#1D9E75" strokeWidth="1.5" opacity="0.3"/>
+      <Circle cx="80" cy="80" r="42" fill="none" stroke="#1D9E75" strokeWidth="2" opacity="0.5"/>
+      <Circle cx="80" cy="80" r="32" fill="#1D9E75"/>
+      <Polyline points="64,82 72,92 96,66" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+    </Svg>
+  );
+}
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -50,6 +63,11 @@ export default function RegisterScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={styles.logoWrap}>
+        <Logo />
+        <Text style={styles.logoText}>ALERTKIND</Text>
+      </View>
+
       <Text style={styles.title}>Welcome to AlertKind</Text>
       <Text style={styles.subtitle}>Set up your daily check-in in seconds</Text>
 
@@ -124,7 +142,9 @@ export default function RegisterScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0a0a14' },
-  content: { padding: 28, paddingTop: 80 },
+  content: { padding: 28, paddingTop: 60 },
+  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 32 },
+  logoText: { color: '#1D9E75', fontSize: 16, fontWeight: '700', letterSpacing: 3 },
   title: { fontSize: 28, fontWeight: '700', color: 'white', marginBottom: 8 },
   subtitle: { fontSize: 14, color: '#666', marginBottom: 40, lineHeight: 22 },
   form: { gap: 8 },
