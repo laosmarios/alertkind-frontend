@@ -29,6 +29,18 @@ export default function HomeScreen() {
       }
       setUserId(id);
       setUserName(name || '');
+
+      // Check if already checked in today
+      try {
+        const res = await fetch(`https://alertkind-production.up.railway.app/checkin/today/${id}`);
+        const data = await res.json();
+        if (data.checkedIn) {
+          checkAnim.setValue(1);
+          setCheckedIn(true);
+        }
+      } catch (e) {
+        console.log('Error checking today status:', e);
+      }
     };
     loadUser();
 
