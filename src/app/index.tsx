@@ -21,16 +21,23 @@ export default function HomeScreen() {
     else setGreeting('Good evening');
 
     const loadUser = async () => {
+      const onboardingDone = await AsyncStorage.getItem('onboarding_done');
       const id = await AsyncStorage.getItem('user_id');
       const name = await AsyncStorage.getItem('user_name');
+
+      if (!onboardingDone) {
+        router.replace('/onboarding');
+        return;
+      }
+
       if (!id) {
         router.replace('/login');
         return;
       }
+
       setUserId(id);
       setUserName(name || '');
 
-      // Check if already checked in today
       try {
         const res = await fetch(`https://alertkind-production.up.railway.app/checkin/today/${id}`);
         const data = await res.json();
