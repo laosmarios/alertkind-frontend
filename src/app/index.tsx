@@ -71,8 +71,11 @@ export default function HomeScreen() {
         <Text style={styles.appName}>AlertKind</Text>
         <View style={styles.headerRight}>
           <View style={[styles.dot, { backgroundColor: checkedIn ? '#1D9E75' : '#444' }]} />
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-            <Text style={styles.logoutText}>Logout</Text>
+          <TouchableOpacity onPress={() => router.push('/profile')} style={styles.headerBtn}>
+            <Text style={styles.headerBtnText}>Profile</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleLogout} style={styles.headerBtn}>
+            <Text style={styles.headerBtnText}>Logout</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -115,8 +118,8 @@ const styles = StyleSheet.create({
   appName: { fontSize: 18, fontWeight: '700', color: 'white', letterSpacing: 1 },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   dot: { width: 10, height: 10, borderRadius: 5 },
-  logoutBtn: { paddingHorizontal: 10, paddingVertical: 4 },
-  logoutText: { color: '#555', fontSize: 12 },
+  headerBtn: { paddingHorizontal: 10, paddingVertical: 4 },
+  headerBtnText: { color: '#555', fontSize: 12 },
   greeting: { fontSize: 26, fontWeight: '700', color: 'white', marginBottom: 10 },
   subtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 52, lineHeight: 22, paddingHorizontal: 16 },
   ringOuter: { width: 200, height: 200, borderRadius: 100, borderWidth: 4, borderColor: '#1D9E75', alignItems: 'center', justifyContent: 'center', marginBottom: 52 },
