@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,7 +27,6 @@ export default function ProfileScreen() {
         setReminderTime(data.user.reminder_time);
       }
 
-      // Load check-in history
       const histRes = await fetch(`https://alertkind-production.up.railway.app/checkins/${id}`);
       const histData = await histRes.json();
       if (histData.checkins) setHistory(histData.checkins);
@@ -51,6 +50,16 @@ export default function ProfileScreen() {
       setTimeout(() => setSuccess(false), 3000);
     }
     setLoading(false);
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm('Are you sure you want to delete your account? This cannot be undone.');
+    if (!confirmed) return;
+    const id = await AsyncStorage.getItem('user_id');
+    await fetch(`https://alertkind-production.up.railway.app/user/${id}`, { method: 'DELETE' });
+    await AsyncStorage.removeItem('user_id');
+    await AsyncStorage.removeItem('user_name');
+    router.replace('/register');
   };
 
   const getLast7Days = () => {
@@ -136,6 +145,10 @@ export default function ProfileScreen() {
           ))}
         </View>
       </View>
+
+      <TouchableOpacity style={styles.deleteBtn} onPress={handleDeleteAccount}>
+        <Text style={styles.deleteBtnText}>Delete account</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -168,4 +181,6 @@ const styles = StyleSheet.create({
   dayItem: { alignItems: 'center', gap: 8 },
   dayDot: { width: 32, height: 32, borderRadius: 16 },
   dayLabel: { fontSize: 11, color: '#555' },
+  deleteBtn: { marginTop: 32, paddingVertical: 16, borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: '#E05252' },
+  deleteBtnText: { color: '#E05252', fontSize: 15, fontWeight: '600' },
 });
