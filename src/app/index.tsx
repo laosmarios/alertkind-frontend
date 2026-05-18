@@ -57,13 +57,24 @@ export default function HomeScreen() {
     }
   };
 
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('user_id');
+    await AsyncStorage.removeItem('user_name');
+    router.replace('/login');
+  };
+
   const bgColor = checkAnim.interpolate({ inputRange: [0, 1], outputRange: ['#0a0a14', '#071a12'] });
 
   return (
     <Animated.View style={[styles.container, { backgroundColor: bgColor }]}>
       <View style={styles.header}>
         <Text style={styles.appName}>AlertKind</Text>
-        <View style={[styles.dot, { backgroundColor: checkedIn ? '#1D9E75' : '#444' }]} />
+        <View style={styles.headerRight}>
+          <View style={[styles.dot, { backgroundColor: checkedIn ? '#1D9E75' : '#444' }]} />
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <Text style={styles.greeting}>{greeting}{userName ? `, ${userName}` : ''} 👋</Text>
@@ -102,7 +113,10 @@ const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28 },
   header: { position: 'absolute', top: 56, left: 28, right: 28, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   appName: { fontSize: 18, fontWeight: '700', color: 'white', letterSpacing: 1 },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   dot: { width: 10, height: 10, borderRadius: 5 },
+  logoutBtn: { paddingHorizontal: 10, paddingVertical: 4 },
+  logoutText: { color: '#555', fontSize: 12 },
   greeting: { fontSize: 26, fontWeight: '700', color: 'white', marginBottom: 10 },
   subtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 52, lineHeight: 22, paddingHorizontal: 16 },
   ringOuter: { width: 200, height: 200, borderRadius: 100, borderWidth: 4, borderColor: '#1D9E75', alignItems: 'center', justifyContent: 'center', marginBottom: 52 },
