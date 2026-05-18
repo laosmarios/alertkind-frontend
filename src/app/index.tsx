@@ -24,7 +24,7 @@ export default function HomeScreen() {
       const id = await AsyncStorage.getItem('user_id');
       const name = await AsyncStorage.getItem('user_name');
       if (!id) {
-        router.replace('/register');
+        router.replace('/login');
         return;
       }
       setUserId(id);
