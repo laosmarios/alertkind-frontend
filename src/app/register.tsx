@@ -21,6 +21,7 @@ export default function RegisterScreen() {
     setLoading(true);
     setError('');
     try {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const response = await fetch('https://alertkind-production.up.railway.app/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -30,6 +31,7 @@ export default function RegisterScreen() {
           contact_email: contactEmail,
           reminder_time: reminderTime,
           alert_hours: parseInt(alertHours),
+          timezone,
         }),
       });
       const data = await response.json();
