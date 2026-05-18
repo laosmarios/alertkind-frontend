@@ -133,6 +133,17 @@ export default function RegisterScreen() {
         <TouchableOpacity style={styles.button} onPress={handleRegister} activeOpacity={0.85}>
           <Text style={styles.buttonText}>{loading ? 'Setting up...' : 'Get started'}</Text>
         </TouchableOpacity>
+
+        <View style={styles.termsRow}>
+          <Text style={styles.termsText}>By registering you agree to our </Text>
+          <TouchableOpacity onPress={() => router.push('/terms')}>
+            <Text style={styles.termsLink}>Terms</Text>
+          </TouchableOpacity>
+          <Text style={styles.termsText}> and </Text>
+          <TouchableOpacity onPress={() => router.push('/privacy')}>
+            <Text style={styles.termsLink}>Privacy Policy</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <Text style={styles.footer}>AlertKind · Your daily safety check-in</Text>
@@ -159,5 +170,8 @@ const styles = StyleSheet.create({
   error: { color: '#E05252', fontSize: 13, marginTop: 8 },
   button: { backgroundColor: '#1D9E75', paddingVertical: 18, borderRadius: 20, alignItems: 'center', marginTop: 32 },
   buttonText: { color: 'white', fontSize: 18, fontWeight: '700' },
+  termsRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: 16 },
+  termsText: { color: '#555', fontSize: 12 },
+  termsLink: { color: '#1D9E75', fontSize: 12 },
   footer: { textAlign: 'center', color: '#333', fontSize: 11, marginTop: 40 },
 });
