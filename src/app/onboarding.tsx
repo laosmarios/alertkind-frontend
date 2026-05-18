@@ -1,9 +1,8 @@
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions, Animated } from 'react-native';
-import { useState, useRef } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const { width } = Dimensions.get('window');
+import Svg, { Circle, Polyline, Text as SvgText } from 'react-native-svg';
 
 const slides = [
   {
@@ -22,6 +21,18 @@ const slides = [
     subtitle: 'Open the app, tap "I\'m okay", and your contact is notified. That\'s it.',
   },
 ];
+
+function Logo() {
+  return (
+    <Svg width="160" height="160" viewBox="0 0 160 160">
+      <Circle cx="80" cy="80" r="70" fill="none" stroke="#1D9E75" strokeWidth="1" opacity="0.15"/>
+      <Circle cx="80" cy="80" r="56" fill="none" stroke="#1D9E75" strokeWidth="1.5" opacity="0.3"/>
+      <Circle cx="80" cy="80" r="42" fill="none" stroke="#1D9E75" strokeWidth="2" opacity="0.5"/>
+      <Circle cx="80" cy="80" r="32" fill="#1D9E75"/>
+      <Polyline points="64,82 72,92 96,66" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+    </Svg>
+  );
+}
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -50,7 +61,14 @@ export default function OnboardingScreen() {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.emoji}>{slide.emoji}</Text>
+        {current === 0 ? (
+          <View style={styles.logoWrap}>
+            <Logo />
+            <Text style={styles.logoText}>ALERTKIND</Text>
+          </View>
+        ) : (
+          <Text style={styles.emoji}>{slide.emoji}</Text>
+        )}
         <Text style={styles.title}>{slide.title}</Text>
         <Text style={styles.subtitle}>{slide.subtitle}</Text>
       </View>
@@ -77,6 +95,8 @@ const styles = StyleSheet.create({
   skipRow: { paddingTop: 60, alignItems: 'flex-end' },
   skip: { color: '#555', fontSize: 14 },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  logoWrap: { alignItems: 'center', marginBottom: 32 },
+  logoText: { color: '#1D9E75', fontSize: 22, fontWeight: '700', letterSpacing: 4, marginTop: 12 },
   emoji: { fontSize: 80, marginBottom: 32 },
   title: { fontSize: 28, fontWeight: '700', color: 'white', textAlign: 'center', marginBottom: 16, lineHeight: 36 },
   subtitle: { fontSize: 16, color: '#666', textAlign: 'center', lineHeight: 26, paddingHorizontal: 16 },
