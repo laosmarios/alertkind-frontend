@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -12,6 +12,7 @@ export default function HomeScreen() {
   const [userName, setUserName] = useState('');
   const [userId, setUserId] = useState('');
   const [streak, setStreak] = useState(0);
+  const [checkinTime, setCheckinTime] = useState('');
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const checkAnim = useRef(new Animated.Value(0)).current;
 
@@ -49,7 +50,18 @@ export default function HomeScreen() {
 
         const userRes = await fetch(`https://alertkind-production.up.railway.app/user/${id}`);
         const userData = await userRes.json();
-        if (userData.user) setStreak(userData.user.streak || 0);
+        if (userData.user) {
+          setStreak(userData.user.streak || 0);
+        }
+
+        // Get today's checkin time
+        const histRes = await fetch(`https://alertkind-production.up.railway.app/checkins/${id}`);
+        const histData = await histRes.json();
+        if (histData.checkins && histData.checkins.length > 0) {
+          const latest = histData.checkins[0];
+          const time = new Date(latest.checked_in_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          setCheckinTime(time);
+        }
       } catch (e) {
         console.log('Error checking today status:', e);
       }
@@ -67,7 +79,6 @@ export default function HomeScreen() {
   const getStreakMilestone = (s: number) => {
     if (s >= 100) return '🏆';
     if (s >= 30) return '⭐';
-    if (s >= 7) return '🔥';
     return '🔥';
   };
 
@@ -83,6 +94,8 @@ export default function HomeScreen() {
         Animated.timing(checkAnim, { toValue: 1, duration: 800, useNativeDriver: false, easing: Easing.out(Easing.ease) }).start();
         setCheckedIn(true);
         setStreak(data.streak || streak + 1);
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        setCheckinTime(time);
       }
     } catch (e) {
       console.log('Error:', e);
@@ -133,6 +146,7 @@ export default function HomeScreen() {
 
       {!checkedIn ? (
         <TouchableOpacity style={styles.button} onPress={handleCheckin} activeOpacity={0.85}>
+          <Text style={styles.buttonEmoji}>🙋</Text>
           <Text style={styles.buttonText}>I'm okay</Text>
           <Text style={styles.buttonSub}>Tap to notify your contact</Text>
         </TouchableOpacity>
@@ -140,7 +154,8 @@ export default function HomeScreen() {
         <View style={styles.successCard}>
           <Text style={styles.successEmoji}>🌿</Text>
           <Text style={styles.successTitle}>All good!</Text>
-          <Text style={styles.successSub}>Your contact has been notified. Have a great day!</Text>
+          <Text style={styles.successSub}>Your contact has been notified.</Text>
+          {checkinTime ? <Text style={styles.checkinTime}>Checked in at {checkinTime}</Text> : null}
           {streak > 0 && (
             <Text style={styles.streakSub}>{getStreakMilestone(streak)} {streak} day streak!</Text>
           )}
@@ -163,18 +178,20 @@ const styles = StyleSheet.create({
   headerBtn: { paddingHorizontal: 10, paddingVertical: 4 },
   headerBtnText: { color: '#555', fontSize: 12 },
   greeting: { fontSize: 26, fontWeight: '700', color: 'white', marginBottom: 10 },
-  subtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 52, lineHeight: 22, paddingHorizontal: 16 },
-  ringOuter: { width: 200, height: 200, borderRadius: 100, borderWidth: 4, borderColor: '#1D9E75', alignItems: 'center', justifyContent: 'center', marginBottom: 52 },
+  subtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 40, lineHeight: 22, paddingHorizontal: 16 },
+  ringOuter: { width: 200, height: 200, borderRadius: 100, borderWidth: 4, borderColor: '#1D9E75', alignItems: 'center', justifyContent: 'center', marginBottom: 40 },
   ringInner: { alignItems: 'center' },
   ringEmoji: { fontSize: 52 },
   ringStatus: { fontSize: 13, marginTop: 12, fontWeight: '500' },
-  button: { backgroundColor: '#1D9E75', width: width - 56, paddingVertical: 20, borderRadius: 20, alignItems: 'center' },
-  buttonText: { color: 'white', fontSize: 20, fontWeight: '700' },
-  buttonSub: { color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 4 },
-  successCard: { backgroundColor: '#0d2a1a', width: width - 56, padding: 28, borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: '#1D9E75' },
+  button: { backgroundColor: '#1D9E75', width: width - 56, paddingVertical: 28, borderRadius: 28, alignItems: 'center', shadowColor: '#1D9E75', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.4, shadowRadius: 16 },
+  buttonEmoji: { fontSize: 32, marginBottom: 8 },
+  buttonText: { color: 'white', fontSize: 24, fontWeight: '800' },
+  buttonSub: { color: 'rgba(255,255,255,0.6)', fontSize: 13, marginTop: 6 },
+  successCard: { backgroundColor: '#0d2a1a', width: width - 56, padding: 28, borderRadius: 24, alignItems: 'center', borderWidth: 1, borderColor: '#1D9E75' },
   successEmoji: { fontSize: 36, marginBottom: 12 },
   successTitle: { fontSize: 22, fontWeight: '700', color: '#1D9E75', marginBottom: 8 },
   successSub: { fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 22 },
+  checkinTime: { fontSize: 12, color: '#444', marginTop: 6 },
   streakSub: { fontSize: 13, color: '#1D9E75', marginTop: 8, fontWeight: '600' },
   footer: { position: 'absolute', bottom: 32, fontSize: 11, color: '#333', letterSpacing: 0.5 },
 });
