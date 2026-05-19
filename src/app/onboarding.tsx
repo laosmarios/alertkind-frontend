@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Animated } from 'react-native';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Svg, { Circle, Polyline, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Polyline } from 'react-native-svg';
 
 const slides = [
   {
@@ -37,10 +37,26 @@ function Logo() {
 export default function OnboardingScreen() {
   const router = useRouter();
   const [current, setCurrent] = useState(0);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+
+  const animateTransition = (nextIndex: number) => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: -30, duration: 200, useNativeDriver: true }),
+    ]).start(() => {
+      setCurrent(nextIndex);
+      slideAnim.setValue(30);
+      Animated.parallel([
+        Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.timing(slideAnim, { toValue: 0, duration: 300, useNativeDriver: true }),
+      ]).start();
+    });
+  };
 
   const handleNext = async () => {
     if (current < slides.length - 1) {
-      setCurrent(current + 1);
+      animateTransition(current + 1);
     } else {
       await AsyncStorage.setItem('onboarding_done', 'true');
       router.replace('/register');
@@ -60,7 +76,7 @@ export default function OnboardingScreen() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.content}>
+      <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ translateX: slideAnim }] }]}>
         {current === 0 ? (
           <View style={styles.logoWrap}>
             <Logo />
@@ -71,11 +87,11 @@ export default function OnboardingScreen() {
         )}
         <Text style={styles.title}>{slide.title}</Text>
         <Text style={styles.subtitle}>{slide.subtitle}</Text>
-      </View>
+      </Animated.View>
 
       <View style={styles.dotsRow}>
         {slides.map((_, i) => (
-          <View key={i} style={[styles.dot, { backgroundColor: i === current ? '#1D9E75' : '#222' }]} />
+          <View key={i} style={[styles.dot, { backgroundColor: i === current ? '#1D9E75' : '#222', width: i === current ? 20 : 8 }]} />
         ))}
       </View>
 
@@ -100,9 +116,9 @@ const styles = StyleSheet.create({
   emoji: { fontSize: 80, marginBottom: 32 },
   title: { fontSize: 28, fontWeight: '700', color: 'white', textAlign: 'center', marginBottom: 16, lineHeight: 36 },
   subtitle: { fontSize: 16, color: '#666', textAlign: 'center', lineHeight: 26, paddingHorizontal: 16 },
-  dotsRow: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 24 },
-  dot: { width: 8, height: 8, borderRadius: 4 },
-  button: { backgroundColor: '#1D9E75', paddingVertical: 20, borderRadius: 20, alignItems: 'center', marginBottom: 16 },
+  dotsRow: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 24, alignItems: 'center' },
+  dot: { height: 8, borderRadius: 4 },
+  button: { backgroundColor: '#1D9E75', paddingVertical: 20, borderRadius: 100, alignItems: 'center', marginBottom: 16 },
   buttonText: { color: 'white', fontSize: 18, fontWeight: '700' },
   footer: { textAlign: 'center', color: '#333', fontSize: 11 },
 });
