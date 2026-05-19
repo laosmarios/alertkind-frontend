@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -50,11 +50,8 @@ export default function HomeScreen() {
 
         const userRes = await fetch(`https://alertkind-production.up.railway.app/user/${id}`);
         const userData = await userRes.json();
-        if (userData.user) {
-          setStreak(userData.user.streak || 0);
-        }
+        if (userData.user) setStreak(userData.user.streak || 0);
 
-        // Get today's checkin time
         const histRes = await fetch(`https://alertkind-production.up.railway.app/checkins/${id}`);
         const histData = await histRes.json();
         if (histData.checkins && histData.checkins.length > 0) {
@@ -146,7 +143,6 @@ export default function HomeScreen() {
 
       {!checkedIn ? (
         <TouchableOpacity style={styles.button} onPress={handleCheckin} activeOpacity={0.85}>
-          <Text style={styles.buttonEmoji}>🙋</Text>
           <Text style={styles.buttonText}>I'm okay</Text>
           <Text style={styles.buttonSub}>Tap to notify your contact</Text>
         </TouchableOpacity>
@@ -178,16 +174,15 @@ const styles = StyleSheet.create({
   headerBtn: { paddingHorizontal: 10, paddingVertical: 4 },
   headerBtnText: { color: '#555', fontSize: 12 },
   greeting: { fontSize: 26, fontWeight: '700', color: 'white', marginBottom: 10 },
-  subtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 40, lineHeight: 22, paddingHorizontal: 16 },
-  ringOuter: { width: 200, height: 200, borderRadius: 100, borderWidth: 4, borderColor: '#1D9E75', alignItems: 'center', justifyContent: 'center', marginBottom: 40 },
+  subtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 52, lineHeight: 22, paddingHorizontal: 16 },
+  ringOuter: { width: 200, height: 200, borderRadius: 100, borderWidth: 4, borderColor: '#1D9E75', alignItems: 'center', justifyContent: 'center', marginBottom: 52 },
   ringInner: { alignItems: 'center' },
   ringEmoji: { fontSize: 52 },
   ringStatus: { fontSize: 13, marginTop: 12, fontWeight: '500' },
-  button: { backgroundColor: '#1D9E75', width: width - 56, paddingVertical: 28, borderRadius: 28, alignItems: 'center', shadowColor: '#1D9E75', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.4, shadowRadius: 16 },
-  buttonEmoji: { fontSize: 32, marginBottom: 8 },
-  buttonText: { color: 'white', fontSize: 24, fontWeight: '800' },
-  buttonSub: { color: 'rgba(255,255,255,0.6)', fontSize: 13, marginTop: 6 },
-  successCard: { backgroundColor: '#0d2a1a', width: width - 56, padding: 28, borderRadius: 24, alignItems: 'center', borderWidth: 1, borderColor: '#1D9E75' },
+  button: { backgroundColor: '#1D9E75', width: width - 56, paddingVertical: 20, borderRadius: 20, alignItems: 'center' },
+  buttonText: { color: 'white', fontSize: 20, fontWeight: '700' },
+  buttonSub: { color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 4 },
+  successCard: { backgroundColor: '#0d2a1a', width: width - 56, padding: 28, borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: '#1D9E75' },
   successEmoji: { fontSize: 36, marginBottom: 12 },
   successTitle: { fontSize: 22, fontWeight: '700', color: '#1D9E75', marginBottom: 8 },
   successSub: { fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 22 },
