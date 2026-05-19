@@ -11,6 +11,7 @@ export default function HomeScreen() {
   const [greeting, setGreeting] = useState('');
   const [userName, setUserName] = useState('');
   const [userId, setUserId] = useState('');
+  const [streak, setStreak] = useState(0);
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const checkAnim = useRef(new Animated.Value(0)).current;
 
@@ -45,6 +46,10 @@ export default function HomeScreen() {
           checkAnim.setValue(1);
           setCheckedIn(true);
         }
+
+        const userRes = await fetch(`https://alertkind-production.up.railway.app/user/${id}`);
+        const userData = await userRes.json();
+        if (userData.user) setStreak(userData.user.streak || 0);
       } catch (e) {
         console.log('Error checking today status:', e);
       }
@@ -59,6 +64,13 @@ export default function HomeScreen() {
     ).start();
   }, []);
 
+  const getStreakMilestone = (s: number) => {
+    if (s >= 100) return '🏆';
+    if (s >= 30) return '⭐';
+    if (s >= 7) return '🔥';
+    return '🔥';
+  };
+
   const handleCheckin = async () => {
     try {
       const response = await fetch('https://alertkind-production.up.railway.app/checkin', {
@@ -70,6 +82,7 @@ export default function HomeScreen() {
       if (data.checkin) {
         Animated.timing(checkAnim, { toValue: 1, duration: 800, useNativeDriver: false, easing: Easing.out(Easing.ease) }).start();
         setCheckedIn(true);
+        setStreak(data.streak || streak + 1);
       }
     } catch (e) {
       console.log('Error:', e);
@@ -89,6 +102,11 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={styles.appName}>AlertKind</Text>
         <View style={styles.headerRight}>
+          {streak > 0 && (
+            <View style={styles.streakBadge}>
+              <Text style={styles.streakText}>{getStreakMilestone(streak)} {streak}</Text>
+            </View>
+          )}
           <View style={[styles.dot, { backgroundColor: checkedIn ? '#1D9E75' : '#444' }]} />
           <TouchableOpacity onPress={() => router.push('/profile')} style={styles.headerBtn}>
             <Text style={styles.headerBtnText}>Profile</Text>
@@ -123,6 +141,9 @@ export default function HomeScreen() {
           <Text style={styles.successEmoji}>🌿</Text>
           <Text style={styles.successTitle}>All good!</Text>
           <Text style={styles.successSub}>Your contact has been notified. Have a great day!</Text>
+          {streak > 0 && (
+            <Text style={styles.streakSub}>{getStreakMilestone(streak)} {streak} day streak!</Text>
+          )}
         </View>
       )}
 
@@ -137,6 +158,8 @@ const styles = StyleSheet.create({
   appName: { fontSize: 18, fontWeight: '700', color: 'white', letterSpacing: 1 },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   dot: { width: 10, height: 10, borderRadius: 5 },
+  streakBadge: { backgroundColor: '#1a1a2e', borderRadius: 12, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: '#333' },
+  streakText: { color: '#aaa', fontSize: 12, fontWeight: '600' },
   headerBtn: { paddingHorizontal: 10, paddingVertical: 4 },
   headerBtnText: { color: '#555', fontSize: 12 },
   greeting: { fontSize: 26, fontWeight: '700', color: 'white', marginBottom: 10 },
@@ -152,5 +175,6 @@ const styles = StyleSheet.create({
   successEmoji: { fontSize: 36, marginBottom: 12 },
   successTitle: { fontSize: 22, fontWeight: '700', color: '#1D9E75', marginBottom: 8 },
   successSub: { fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 22 },
+  streakSub: { fontSize: 13, color: '#1D9E75', marginTop: 8, fontWeight: '600' },
   footer: { position: 'absolute', bottom: 32, fontSize: 11, color: '#333', letterSpacing: 0.5 },
 });
