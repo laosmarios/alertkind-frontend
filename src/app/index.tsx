@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Animated, Easing, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Animated, Easing, Dimensions, TextInput } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,6 +14,7 @@ export default function HomeScreen() {
   const [userId, setUserId] = useState('');
   const [streak, setStreak] = useState(0);
   const [checkinTime, setCheckinTime] = useState('');
+  const [note, setNote] = useState('');
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -83,7 +84,7 @@ export default function HomeScreen() {
       const response = await fetch('https://alertkind-production.up.railway.app/checkin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId }),
+        body: JSON.stringify({ user_id: userId, note: note || null }),
       });
       const data = await response.json();
       if (data.checkin) {
@@ -142,15 +143,26 @@ export default function HomeScreen() {
       </Animated.View>
 
       {!checkedIn ? (
-        <TouchableOpacity style={styles.button} onPress={handleCheckin} activeOpacity={0.85}>
-          <Text style={styles.buttonText}>I'm okay</Text>
-          <Text style={styles.buttonSub}>Tap to notify your contact</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonWrap}>
+          <TextInput
+            style={styles.noteInput}
+            placeholder="Add a note (optional)"
+            placeholderTextColor="#444"
+            value={note}
+            onChangeText={setNote}
+            maxLength={100}
+          />
+          <TouchableOpacity style={styles.button} onPress={handleCheckin} activeOpacity={0.85}>
+            <Text style={styles.buttonText}>I'm okay</Text>
+            <Text style={styles.buttonSub}>Tap to notify your contact</Text>
+          </TouchableOpacity>
+        </View>
       ) : (
         <View style={styles.successCard}>
           <Text style={styles.successEmoji}>🌿</Text>
           <Text style={styles.successTitle}>All good!</Text>
           <Text style={styles.successSub}>Your contact has been notified.</Text>
+          {note ? <Text style={styles.noteDisplay}>📝 {note}</Text> : null}
           {checkinTime ? <Text style={styles.checkinTime}>Checked in at {checkinTime}</Text> : null}
           {streak > 0 && (
             <Text style={styles.streakSub}>{getStreakMilestone(streak)} {streak} day streak!</Text>
@@ -175,17 +187,20 @@ const styles = StyleSheet.create({
   headerBtnText: { color: '#555', fontSize: 12 },
   greeting: { fontSize: 26, fontWeight: '700', color: 'white', marginBottom: 10 },
   subtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 52, lineHeight: 22, paddingHorizontal: 16 },
-  ringOuter: { width: 200, height: 200, borderRadius: 100, borderWidth: 4, borderColor: '#1D9E75', alignItems: 'center', justifyContent: 'center', marginBottom: 52 },
+  ringOuter: { width: 200, height: 200, borderRadius: 100, borderWidth: 4, borderColor: '#1D9E75', alignItems: 'center', justifyContent: 'center', marginBottom: 32 },
   ringInner: { alignItems: 'center' },
   ringEmoji: { fontSize: 52 },
   ringStatus: { fontSize: 13, marginTop: 12, fontWeight: '500' },
-  button: { backgroundColor: '#1D9E75', width: width - 56, paddingVertical: 20, paddingHorizontal: 20, borderRadius: 100, alignItems: 'center' },
+  buttonWrap: { width: width - 56, gap: 12 },
+  noteInput: { backgroundColor: '#141420', borderWidth: 1, borderColor: '#222', borderRadius: 16, padding: 14, color: 'white', fontSize: 14 },
+  button: { backgroundColor: '#1D9E75', width: '100%', paddingVertical: 20, borderRadius: 100, alignItems: 'center' },
   buttonText: { color: 'white', fontSize: 18, fontWeight: '700', letterSpacing: 0.5 },
   buttonSub: { color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 4 },
   successCard: { backgroundColor: '#0d2a1a', width: width - 56, padding: 28, borderRadius: 24, alignItems: 'center', borderWidth: 1, borderColor: '#1D9E75' },
   successEmoji: { fontSize: 36, marginBottom: 12 },
   successTitle: { fontSize: 22, fontWeight: '700', color: '#1D9E75', marginBottom: 8 },
   successSub: { fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 22 },
+  noteDisplay: { fontSize: 13, color: '#aaa', marginTop: 8, textAlign: 'center' },
   checkinTime: { fontSize: 12, color: '#444', marginTop: 6 },
   streakSub: { fontSize: 13, color: '#1D9E75', marginTop: 8, fontWeight: '600' },
   footer: { position: 'absolute', bottom: 32, fontSize: 11, color: '#333', letterSpacing: 0.5 },
