@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   streakText: { color: '#aaa', fontSize: 12, fontWeight: '600' },
   headerBtn: { paddingHorizontal: 10, paddingVertical: 4 },
   headerBtnText: { color: '#555', fontSize: 12 },
-  greeting: { fontSize: 26, fontWeight: '700', color: 'white', margin Bottom: 10 },
+  greeting: { fontSize: 26, fontWeight: '700', color: 'white', marginBottom: 10 },
   subtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 52, lineHeight: 22, paddingHorizontal: 16 },
   ringOuter: { width: 200, height: 200, borderRadius: 100, borderWidth: 4, borderColor: '#1D9E75', alignItems: 'center', justifyContent: 'center', marginBottom: 52 },
   ringInner: { alignItems: 'center' },
