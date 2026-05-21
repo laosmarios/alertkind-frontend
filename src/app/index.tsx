@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Animated, Easing, Dimensions, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Animated, Easing, Dimensions, TextInput, ScrollView } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -44,9 +44,7 @@ export default function HomeScreen() {
       try {
         const res = await fetch(`https://alertkind-production.up.railway.app/checkin/today/${id}`);
         const data = await res.json();
-        if (data.checkedIn) {
-          setCheckedIn(true);
-        }
+        if (data.checkedIn) setCheckedIn(true);
 
         const userRes = await fetch(`https://alertkind-production.up.railway.app/user/${id}`);
         const userData = await userRes.json();
@@ -60,7 +58,7 @@ export default function HomeScreen() {
           setCheckinTime(time);
         }
       } catch (e) {
-        console.log('Error checking today status:', e);
+        console.log('Error:', e);
       }
     };
     loadUser();
@@ -128,56 +126,59 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <Text style={styles.greeting}>{greeting}{userName ? `, ${userName}` : ''} 👋</Text>
-      <Text style={styles.subtitle}>
-        {checkedIn ? 'Your contact knows you are okay' : 'One tap is all it takes to let them know'}
-      </Text>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <Text style={styles.greeting}>{greeting}{userName ? `, ${userName}` : ''} 👋</Text>
+        <Text style={styles.subtitle}>
+          {checkedIn ? 'Your contact knows you are okay' : 'One tap is all it takes to let them know'}
+        </Text>
 
-      <Animated.View style={[styles.ringOuter, { transform: [{ scale: checkedIn ? 1 : pulseAnim }] }]}>
-        <View style={styles.ringInner}>
-          <Text style={styles.ringEmoji}>{checkedIn ? '✅' : '🛡️'}</Text>
-          <Text style={[styles.ringStatus, { color: checkedIn ? '#1D9E75' : '#555' }]}>
-            {checkedIn ? 'Checked in ✓' : 'Waiting...'}
-          </Text>
-        </View>
-      </Animated.View>
+        <Animated.View style={[styles.ringOuter, { transform: [{ scale: checkedIn ? 1 : pulseAnim }] }]}>
+          <View style={styles.ringInner}>
+            <Text style={styles.ringEmoji}>{checkedIn ? '✅' : '🛡️'}</Text>
+            <Text style={[styles.ringStatus, { color: checkedIn ? '#1D9E75' : '#555' }]}>
+              {checkedIn ? 'Checked in ✓' : 'Waiting...'}
+            </Text>
+          </View>
+        </Animated.View>
 
-      {!checkedIn ? (
-        <View style={styles.buttonWrap}>
-          <TextInput
-            style={styles.noteInput}
-            placeholder="Add a note (optional)"
-            placeholderTextColor="#444"
-            value={note}
-            onChangeText={setNote}
-            maxLength={100}
-          />
-          <TouchableOpacity style={styles.button} onPress={handleCheckin} activeOpacity={0.85}>
-            <Text style={styles.buttonText}>I'm okay</Text>
-            <Text style={styles.buttonSub}>Tap to notify your contact</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <View style={styles.successCard}>
-          <Text style={styles.successEmoji}>🌿</Text>
-          <Text style={styles.successTitle}>All good!</Text>
-          <Text style={styles.successSub}>Your contact has been notified.</Text>
-          {note ? <Text style={styles.noteDisplay}>📝 {note}</Text> : null}
-          {checkinTime ? <Text style={styles.checkinTime}>Checked in at {checkinTime}</Text> : null}
-          {streak > 0 && (
-            <Text style={styles.streakSub}>{getStreakMilestone(streak)} {streak} day streak!</Text>
-          )}
-        </View>
-      )}
+        {!checkedIn ? (
+          <View style={styles.buttonWrap}>
+            <TextInput
+              style={styles.noteInput}
+              placeholder="Add a note (optional)"
+              placeholderTextColor="#444"
+              value={note}
+              onChangeText={setNote}
+              maxLength={100}
+            />
+            <TouchableOpacity style={styles.button} onPress={handleCheckin} activeOpacity={0.85}>
+              <Text style={styles.buttonText}>I'm okay</Text>
+              <Text style={styles.buttonSub}>Tap to notify your contact</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.successCard}>
+            <Text style={styles.successEmoji}>🌿</Text>
+            <Text style={styles.successTitle}>All good!</Text>
+            <Text style={styles.successSub}>Your contact has been notified.</Text>
+            {note ? <Text style={styles.noteDisplay}>📝 {note}</Text> : null}
+            {checkinTime ? <Text style={styles.checkinTime}>Checked in at {checkinTime}</Text> : null}
+            {streak > 0 && (
+              <Text style={styles.streakSub}>{getStreakMilestone(streak)} {streak} day streak!</Text>
+            )}
+          </View>
+        )}
 
-      <Text style={styles.footer}>AlertKind · Your daily check-in</Text>
+        <Text style={styles.footer}>AlertKind · Your daily check-in</Text>
+      </ScrollView>
     </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28 },
-  header: { position: 'absolute', top: 56, left: 28, right: 28, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  container: { flex: 1, paddingHorizontal: 28 },
+  scrollContent: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 120, paddingBottom: 40 },
+  header: { position: 'absolute', top: 56, left: 28, right: 28, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', zIndex: 10 },
   appName: { fontSize: 18, fontWeight: '700', color: 'white', letterSpacing: 1 },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   dot: { width: 10, height: 10, borderRadius: 5 },
@@ -185,12 +186,12 @@ const styles = StyleSheet.create({
   streakText: { color: '#aaa', fontSize: 12, fontWeight: '600' },
   headerBtn: { paddingHorizontal: 10, paddingVertical: 4 },
   headerBtnText: { color: '#555', fontSize: 12 },
-  greeting: { fontSize: 26, fontWeight: '700', color: 'white', marginBottom: 10 },
-  subtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 52, lineHeight: 22, paddingHorizontal: 16 },
-  ringOuter: { width: 200, height: 200, borderRadius: 100, borderWidth: 4, borderColor: '#1D9E75', alignItems: 'center', justifyContent: 'center', marginBottom: 32 },
+  greeting: { fontSize: 26, fontWeight: '700', color: 'white', marginBottom: 8, textAlign: 'center' },
+  subtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 32, lineHeight: 22, paddingHorizontal: 16 },
+  ringOuter: { width: 180, height: 180, borderRadius: 90, borderWidth: 4, borderColor: '#1D9E75', alignItems: 'center', justifyContent: 'center', marginBottom: 32 },
   ringInner: { alignItems: 'center' },
-  ringEmoji: { fontSize: 52 },
-  ringStatus: { fontSize: 13, marginTop: 12, fontWeight: '500' },
+  ringEmoji: { fontSize: 48 },
+  ringStatus: { fontSize: 13, marginTop: 10, fontWeight: '500' },
   buttonWrap: { width: width - 56, gap: 12 },
   noteInput: { backgroundColor: '#141420', borderWidth: 1, borderColor: '#222', borderRadius: 16, padding: 14, color: 'white', fontSize: 14 },
   button: { backgroundColor: '#1D9E75', width: '100%', paddingVertical: 20, borderRadius: 100, alignItems: 'center' },
@@ -203,5 +204,5 @@ const styles = StyleSheet.create({
   noteDisplay: { fontSize: 13, color: '#aaa', marginTop: 8, textAlign: 'center' },
   checkinTime: { fontSize: 12, color: '#444', marginTop: 6 },
   streakSub: { fontSize: 13, color: '#1D9E75', marginTop: 8, fontWeight: '600' },
-  footer: { position: 'absolute', bottom: 32, fontSize: 11, color: '#333', letterSpacing: 0.5 },
+  footer: { textAlign: 'center', fontSize: 11, color: '#333', letterSpacing: 0.5, marginTop: 32 },
 });
