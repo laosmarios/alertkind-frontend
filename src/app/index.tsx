@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Animated, Easing, Dimensions 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
 
@@ -14,7 +15,6 @@ export default function HomeScreen() {
   const [streak, setStreak] = useState(0);
   const [checkinTime, setCheckinTime] = useState('');
   const pulseAnim = useRef(new Animated.Value(1)).current;
-  const checkAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -44,7 +44,6 @@ export default function HomeScreen() {
         const res = await fetch(`https://alertkind-production.up.railway.app/checkin/today/${id}`);
         const data = await res.json();
         if (data.checkedIn) {
-          checkAnim.setValue(1);
           setCheckedIn(true);
         }
 
@@ -88,7 +87,6 @@ export default function HomeScreen() {
       });
       const data = await response.json();
       if (data.checkin) {
-        Animated.timing(checkAnim, { toValue: 1, duration: 800, useNativeDriver: false, easing: Easing.out(Easing.ease) }).start();
         setCheckedIn(true);
         setStreak(data.streak || streak + 1);
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -105,10 +103,12 @@ export default function HomeScreen() {
     router.replace('/login');
   };
 
-  const bgColor = checkAnim.interpolate({ inputRange: [0, 1], outputRange: ['#0a0a14', '#071a12'] });
+  const gradientColors = checkedIn
+    ? ['#050f0a', '#071a12', '#0a0a14'] as const
+    : ['#0a0a14', '#0d0d1f', '#080814'] as const;
 
   return (
-    <Animated.View style={[styles.container, { backgroundColor: bgColor }]}>
+    <LinearGradient colors={gradientColors} style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.appName}>AlertKind</Text>
         <View style={styles.headerRight}>
@@ -132,7 +132,10 @@ export default function HomeScreen() {
         {checkedIn ? 'Your contact knows you are okay' : 'One tap is all it takes to let them know'}
       </Text>
 
-      <Animated.View style={[styles.ringOuter, { transform: [{ scale: checkedIn ? 1 : pulseAnim }] }]}>
+      <Animated.View style={[styles.ringOuter, { 
+        borderColor: checkedIn ? '#1D9E75' : '#1D9E75',
+        transform: [{ scale: checkedIn ? 1 : pulseAnim }] 
+      }]}>
         <View style={styles.ringInner}>
           <Text style={styles.ringEmoji}>{checkedIn ? '✅' : '🛡️'}</Text>
           <Text style={[styles.ringStatus, { color: checkedIn ? '#1D9E75' : '#555' }]}>
@@ -159,7 +162,7 @@ export default function HomeScreen() {
       )}
 
       <Text style={styles.footer}>AlertKind · Your daily check-in</Text>
-    </Animated.View>
+    </LinearGradient>
   );
 }
 
