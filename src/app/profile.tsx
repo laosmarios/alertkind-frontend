@@ -10,7 +10,6 @@ export default function ProfileScreen() {
   const [contactEmail, setContactEmail] = useState('');
   const [alertHours, setAlertHours] = useState('');
   const [reminderTime, setReminderTime] = useState('');
-  const [vacationDays, setVacationDays] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
@@ -53,34 +52,6 @@ export default function ProfileScreen() {
     setLoading(false);
   };
 
-  const handleVacation = async () => {
-    const days = parseInt(vacationDays);
-    if (!days || days < 1 || days > 30) return;
-    const id = await AsyncStorage.getItem('user_id');
-    const vacationUntil = new Date();
-    vacationUntil.setDate(vacationUntil.getDate() + days);
-    const vacationUntilStr = vacationUntil.toISOString().split('T')[0];
-    await fetch(`https://alertkind-production.up.railway.app/user/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contact_email: contactEmail, alert_hours: parseInt(alertHours), reminder_time: reminderTime, vacation_until: vacationUntilStr }),
-    });
-    setUser({ ...user, vacation_until: vacationUntilStr });
-    setVacationDays('');
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 3000);
-  };
-
-  const handleCancelVacation = async () => {
-    const id = await AsyncStorage.getItem('user_id');
-    await fetch(`https://alertkind-production.up.railway.app/user/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contact_email: contactEmail, alert_hours: parseInt(alertHours), reminder_time: reminderTime, vacation_until: null }),
-    });
-    setUser({ ...user, vacation_until: null });
-  };
-
   const handleDeleteAccount = async () => {
     const confirmed = window.confirm('Are you sure you want to delete your account? This cannot be undone.');
     if (!confirmed) return;
@@ -90,8 +61,6 @@ export default function ProfileScreen() {
     await AsyncStorage.removeItem('user_name');
     router.replace('/register');
   };
-
-  const isOnVacation = user?.vacation_until && user.vacation_until >= new Date().toISOString().split('T')[0];
 
   const getLast7Days = () => {
     const days = [];
@@ -163,36 +132,6 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       )}
 
-      <View style={styles.vacationCard}>
-        <Text style={styles.vacationTitle}>🏖️ Vacation mode</Text>
-        {isOnVacation ? (
-          <>
-            <Text style={styles.vacationActive}>Active until {user.vacation_until}</Text>
-            <TouchableOpacity style={styles.cancelVacationBtn} onPress={handleCancelVacation}>
-              <Text style={styles.cancelVacationText}>Cancel vacation mode</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <Text style={styles.vacationSub}>Pause alerts while you're away</Text>
-            <View style={styles.vacationRow}>
-              <TextInput
-                style={styles.vacationInput}
-                placeholder="Days (1-30)"
-                placeholderTextColor="#444"
-                value={vacationDays}
-                onChangeText={setVacationDays}
-                keyboardType="number-pad"
-                maxLength={2}
-              />
-              <TouchableOpacity style={styles.vacationBtn} onPress={handleVacation}>
-                <Text style={styles.vacationBtnText}>Activate</Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
-      </View>
-
       <View style={styles.historyCard}>
         <Text style={styles.historyTitle}>Last 7 days</Text>
         <View style={styles.daysRow}>
@@ -236,16 +175,6 @@ const styles = StyleSheet.create({
   success: { color: '#1D9E75', textAlign: 'center', marginTop: 16, fontSize: 14 },
   saveBtn: { backgroundColor: '#1D9E75', paddingVertical: 18, borderRadius: 20, alignItems: 'center', marginTop: 24 },
   saveBtnText: { color: 'white', fontSize: 18, fontWeight: '700' },
-  vacationCard: { backgroundColor: '#141420', borderRadius: 20, padding: 24, borderWidth: 1, borderColor: '#222', marginTop: 16 },
-  vacationTitle: { fontSize: 15, fontWeight: '700', color: 'white', marginBottom: 8 },
-  vacationSub: { fontSize: 13, color: '#555', marginBottom: 16 },
-  vacationActive: { fontSize: 14, color: '#1D9E75', marginBottom: 12 },
-  vacationRow: { flexDirection: 'row', gap: 12 },
-  vacationInput: { flex: 1, backgroundColor: '#0a0a14', borderWidth: 1, borderColor: '#333', borderRadius: 10, padding: 12, color: 'white', fontSize: 15 },
-  vacationBtn: { backgroundColor: '#1D9E75', paddingHorizontal: 20, borderRadius: 10, justifyContent: 'center' },
-  vacationBtnText: { color: 'white', fontWeight: '700' },
-  cancelVacationBtn: { paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: '#E05252', alignItems: 'center' },
-  cancelVacationText: { color: '#E05252', fontSize: 13 },
   historyCard: { backgroundColor: '#141420', borderRadius: 20, padding: 24, borderWidth: 1, borderColor: '#222', marginTop: 16 },
   historyTitle: { fontSize: 14, fontWeight: '600', color: '#aaa', marginBottom: 16 },
   daysRow: { flexDirection: 'row', justifyContent: 'space-between' },
