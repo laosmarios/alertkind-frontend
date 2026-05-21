@@ -105,7 +105,7 @@ export default function HomeScreen() {
 
   const gradientColors = checkedIn
     ? ['#050f0a', '#071a12', '#0a0a14'] as const
-    : ['#0a0a14', '#0d0d1f', '#080814'] as const;
+    : ['#080810', '#0a0a14', '#080810'] as const;
 
   return (
     <LinearGradient colors={gradientColors} style={styles.container}>
@@ -132,10 +132,7 @@ export default function HomeScreen() {
         {checkedIn ? 'Your contact knows you are okay' : 'One tap is all it takes to let them know'}
       </Text>
 
-      <Animated.View style={[styles.ringOuter, { 
-        borderColor: checkedIn ? '#1D9E75' : '#1D9E75',
-        transform: [{ scale: checkedIn ? 1 : pulseAnim }] 
-      }]}>
+      <Animated.View style={[styles.ringOuter, { transform: [{ scale: checkedIn ? 1 : pulseAnim }] }]}>
         <View style={styles.ringInner}>
           <Text style={styles.ringEmoji}>{checkedIn ? '✅' : '🛡️'}</Text>
           <Text style={[styles.ringStatus, { color: checkedIn ? '#1D9E75' : '#555' }]}>
@@ -176,7 +173,7 @@ const styles = StyleSheet.create({
   streakText: { color: '#aaa', fontSize: 12, fontWeight: '600' },
   headerBtn: { paddingHorizontal: 10, paddingVertical: 4 },
   headerBtnText: { color: '#555', fontSize: 12 },
-  greeting: { fontSize: 26, fontWeight: '700', color: 'white', marginBottom: 10 },
+  greeting: { fontSize: 26, fontWeight: '700', color: 'white', margin Bottom: 10 },
   subtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 52, lineHeight: 22, paddingHorizontal: 16 },
   ringOuter: { width: 200, height: 200, borderRadius: 100, borderWidth: 4, borderColor: '#1D9E75', alignItems: 'center', justifyContent: 'center', marginBottom: 52 },
   ringInner: { alignItems: 'center' },
