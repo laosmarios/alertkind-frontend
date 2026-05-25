@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Circle, Polyline } from 'react-native-svg';
+import i18n from './i18n';
 
 function Logo() {
   return (
@@ -25,10 +25,11 @@ export default function RegisterScreen() {
   const [alertHours, setAlertHours] = useState('48');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [sent, setSent] = useState(false);
 
   const handleRegister = async () => {
     if (!name || !email || !contactEmail) {
-      setError('Please fill in all fields');
+      setError(i18n.t('fillAllFields'));
       return;
     }
     setLoading(true);
@@ -48,18 +49,30 @@ export default function RegisterScreen() {
         }),
       });
       const data = await response.json();
-      if (data.user) {
-        await AsyncStorage.setItem('user_id', data.user.id);
-        await AsyncStorage.setItem('user_name', data.user.name);
-        router.replace('/');
+      if (response.ok) {
+        setSent(true);
       } else {
-        setError(data.error || 'Something went wrong');
+        setError(data.error || i18n.t('couldNotConnect'));
       }
     } catch (e) {
-      setError('Could not connect to server');
+      setError(i18n.t('couldNotConnect'));
     }
     setLoading(false);
   };
+
+  if (sent) {
+    return (
+      <View style={styles.sentContainer}>
+        <Text style={styles.sentEmoji}>📧</Text>
+        <Text style={styles.sentTitle}>Check your email!</Text>
+        <Text style={styles.sentSub}>We sent a verification link to{'\n'}<Text style={styles.sentEmail}>{email}</Text></Text>
+        <Text style={styles.sentNote}>Click the link to activate your account.{'\n'}It expires in 15 minutes.</Text>
+        <TouchableOpacity onPress={() => setSent(false)} style={styles.backBtn}>
+          <Text style={styles.backBtnText}>Use a different email</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -68,11 +81,11 @@ export default function RegisterScreen() {
         <Text style={styles.logoText}>ALERTKIND</Text>
       </View>
 
-      <Text style={styles.title}>Welcome to AlertKind</Text>
-      <Text style={styles.subtitle}>Set up your daily check-in in seconds</Text>
+      <Text style={styles.title}>{i18n.t('welcomeTo')}</Text>
+      <Text style={styles.subtitle}>{i18n.t('setupCheckin')}</Text>
 
       <View style={styles.form}>
-        <Text style={styles.label}>Your name</Text>
+        <Text style={styles.label}>{i18n.t('yourName')}</Text>
         <TextInput
           style={styles.input}
           placeholder="e.g. Maria"
@@ -81,7 +94,7 @@ export default function RegisterScreen() {
           onChangeText={setName}
         />
 
-        <Text style={styles.label}>Your email</Text>
+        <Text style={styles.label}>{i18n.t('yourEmail')}</Text>
         <TextInput
           style={styles.input}
           placeholder="you@example.com"
@@ -92,8 +105,8 @@ export default function RegisterScreen() {
           autoCapitalize="none"
         />
 
-        <Text style={styles.label}>Trusted contact email</Text>
-        <Text style={styles.labelSub}>This person will be notified if you miss a check-in</Text>
+        <Text style={styles.label}>{i18n.t('trustedContactEmail')}</Text>
+        <Text style={styles.labelSub}>{i18n.t('trustedContactSub')}</Text>
         <TextInput
           style={styles.input}
           placeholder="friend@example.com"
@@ -104,7 +117,7 @@ export default function RegisterScreen() {
           autoCapitalize="none"
         />
 
-        <Text style={styles.label}>Daily reminder time</Text>
+        <Text style={styles.label}>{i18n.t('dailyReminder')}</Text>
         <TextInput
           style={styles.input}
           placeholder="09:00"
@@ -113,7 +126,7 @@ export default function RegisterScreen() {
           onChangeText={setReminderTime}
         />
 
-        <Text style={styles.label}>Alert contact after</Text>
+        <Text style={styles.label}>{i18n.t('alertAfter')}</Text>
         <View style={styles.hoursRow}>
           {['24', '48', '72'].map(h => (
             <TouchableOpacity
@@ -131,7 +144,7 @@ export default function RegisterScreen() {
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         <TouchableOpacity style={styles.button} onPress={handleRegister} activeOpacity={0.85}>
-          <Text style={styles.buttonText}>{loading ? 'Setting up...' : 'Get started'}</Text>
+          <Text style={styles.buttonText}>{loading ? i18n.t('settingUp') : i18n.t('getStarted')}</Text>
         </TouchableOpacity>
 
         <View style={styles.termsRow}>
@@ -144,9 +157,13 @@ export default function RegisterScreen() {
             <Text style={styles.termsLink}>Privacy Policy</Text>
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity onPress={() => router.replace('/login')} style={styles.link}>
+          <Text style={styles.linkText}>Already have an account? Sign in</Text>
+        </TouchableOpacity>
       </View>
 
-      <Text style={styles.footer}>AlertKind · Your daily safety check-in</Text>
+      <Text style={styles.footer}>{i18n.t('footer')}</Text>
     </ScrollView>
   );
 }
@@ -168,10 +185,20 @@ const styles = StyleSheet.create({
   hourBtnText: { color: '#555', fontWeight: '600' },
   hourBtnTextActive: { color: '#1D9E75' },
   error: { color: '#E05252', fontSize: 13, marginTop: 8 },
-  button: { backgroundColor: '#1D9E75', paddingVertical: 18, borderRadius: 20, alignItems: 'center', marginTop: 32 },
+  button: { backgroundColor: '#1D9E75', paddingVertical: 18, borderRadius: 100, alignItems: 'center', marginTop: 32 },
   buttonText: { color: 'white', fontSize: 18, fontWeight: '700' },
   termsRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: 16 },
   termsText: { color: '#555', fontSize: 12 },
   termsLink: { color: '#1D9E75', fontSize: 12 },
+  link: { alignItems: 'center', marginTop: 16 },
+  linkText: { color: '#555', fontSize: 13 },
   footer: { textAlign: 'center', color: '#333', fontSize: 11, marginTop: 40 },
+  sentContainer: { flex: 1, backgroundColor: '#0a0a14', padding: 28, justifyContent: 'center', alignItems: 'center' },
+  sentEmoji: { fontSize: 64, marginBottom: 24 },
+  sentTitle: { fontSize: 28, fontWeight: '700', color: 'white', textAlign: 'center', marginBottom: 16 },
+  sentSub: { fontSize: 16, color: '#666', textAlign: 'center', lineHeight: 26, marginBottom: 12 },
+  sentEmail: { color: '#1D9E75', fontWeight: '600' },
+  sentNote: { fontSize: 13, color: '#444', textAlign: 'center', lineHeight: 22, marginBottom: 40 },
+  backBtn: { alignItems: 'center' },
+  backBtnText: { color: '#555', fontSize: 14 },
 });
