@@ -47,7 +47,7 @@ export default function TermsScreen() {
       <Text style={styles.body}>We may update these terms at any time. We will notify you of significant changes via email. Continued use of the app after changes constitutes acceptance of the new terms.</Text>
 
       <Text style={styles.section}>11. Contact</Text>
-      <Text style={styles.body}>If you have any questions about these Terms, please contact us at legal@alertkind.com</Text>
+      <Text style={styles.body}>If you have any questions about these Terms, please contact us at alertkind.support@gmail.com</Text>
 
       <Text style={styles.footer}>AlertKind · alertkind.com</Text>
     </ScrollView>

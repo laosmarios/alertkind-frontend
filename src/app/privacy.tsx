@@ -17,7 +17,7 @@ export default function PrivacyScreen() {
       <Text style={styles.date}>Last updated: May 2026</Text>
 
       <Text style={styles.section}>1. Data Controller</Text>
-      <Text style={styles.body}>AlertKind is operated as an independent service. For any data-related inquiries, contact us at privacy@alertkind.com. The service is governed by the laws of the Republic of Cyprus.</Text>
+      <Text style={styles.body}>AlertKind is operated as an independent service. For any data-related inquiries, contact us at alertkind.support@gmail.com. The service is governed by the laws of the Republic of Cyprus.</Text>
 
       <Text style={styles.section}>2. Information We Collect</Text>
       <Text style={styles.body}>We collect your name, email address, trusted contact email, daily reminder time, alert preferences, and timezone when you register. We also store the time and date of your daily check-ins.</Text>
@@ -38,7 +38,7 @@ export default function PrivacyScreen() {
       <Text style={styles.body}>AlertKind does not use tracking cookies. We only use essential session storage to keep you logged in on your device.</Text>
 
       <Text style={styles.section}>8. Your Rights (GDPR)</Text>
-      <Text style={styles.body}>If you are located in the European Union or European Economic Area, you have the following rights:{'\n\n'}• Right to access your personal data{'\n'}• Right to correct inaccurate data{'\n'}• Right to delete your data{'\n'}• Right to data portability{'\n'}• Right to object to processing{'\n\n'}You can exercise these rights by deleting your account in the app or contacting us at privacy@alertkind.com.</Text>
+      <Text style={styles.body}>If you are located in the European Union or European Economic Area, you have the following rights:{'\n\n'}• Right to access your personal data{'\n'}• Right to correct inaccurate data{'\n'}• Right to delete your data{'\n'}• Right to data portability{'\n'}• Right to object to processing{'\n\n'}You can exercise these rights by deleting your account in the app or contacting us at alertkind.support@gmail.com.</Text>
 
       <Text style={styles.section}>9. Minimum Age</Text>
       <Text style={styles.body}>AlertKind is intended for users aged 16 and older. By registering, you confirm that you are at least 16 years old. If you are under 16, please do not use this service.</Text>
@@ -47,7 +47,7 @@ export default function PrivacyScreen() {
       <Text style={styles.body}>We may update this Privacy Policy from time to time. We will notify you of significant changes via email. Continued use of the app after changes constitutes acceptance.</Text>
 
       <Text style={styles.section}>11. Contact</Text>
-      <Text style={styles.body}>For any privacy-related questions, contact us at privacy@alertkind.com</Text>
+      <Text style={styles.body}>For any privacy-related questions, contact us at alertkind.support@gmail.com</Text>
 
       <Text style={styles.footer}>AlertKind · alertkind.com</Text>
     </ScrollView>
