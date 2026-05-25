@@ -5,37 +5,31 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function VerifyScreen() {
   const router = useRouter();
-  const { token } = useLocalSearchParams();
+  const { user_id, user_name, error: errorParam } = useLocalSearchParams();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [message, setMessage] = useState('Verifying your link...');
+  const [message, setMessage] = useState('Signing you in...');
 
   useEffect(() => {
     const verify = async () => {
-      if (!token) {
+      if (errorParam) {
         setStatus('error');
-        setMessage('Invalid link.');
+        setMessage(errorParam === 'expired' ? 'Link expired. Please try again.' : 'Invalid link. Please try again.');
         return;
       }
-      try {
-        const res = await fetch(`https://alertkind-production.up.railway.app/verify?token=${token}`);
-        const data = await res.json();
-        if (data.user) {
-          await AsyncStorage.setItem('user_id', data.user.id);
-          await AsyncStorage.setItem('user_name', data.user.name);
-          setStatus('success');
-          setMessage('Verified! Taking you to the app...');
-          setTimeout(() => router.replace('/'), 1500);
-        } else {
-          setStatus('error');
-          setMessage(data.error || 'Invalid or expired link.');
-        }
-      } catch (e) {
+
+      if (user_id && user_name) {
+        await AsyncStorage.setItem('user_id', user_id as string);
+        await AsyncStorage.setItem('user_name', user_name as string);
+        setStatus('success');
+        setMessage('Signed in! Taking you to the app...');
+        setTimeout(() => router.replace('/'), 1500);
+      } else {
         setStatus('error');
-        setMessage('Could not connect to server.');
+        setMessage('Invalid link. Please try again.');
       }
     };
     verify();
-  }, [token]);
+  }, [user_id, user_name, errorParam]);
 
   return (
     <View style={styles.container}>
