@@ -59,7 +59,7 @@ export default function ProfileScreen() {
     await fetch(`https://alertkind-production.up.railway.app/user/${id}`, { method: 'DELETE' });
     await AsyncStorage.removeItem('user_id');
     await AsyncStorage.removeItem('user_name');
-    router.replace('/register');
+    router.replace('/login');
   };
 
   const getLast7Days = () => {
