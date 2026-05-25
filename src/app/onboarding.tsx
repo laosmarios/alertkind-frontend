@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TouchableOpacity, Animated } from 'react-native';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Circle, Polyline } from 'react-native-svg';
@@ -59,7 +59,7 @@ export default function OnboardingScreen() {
       animateTransition(current + 1);
     } else {
       await AsyncStorage.setItem('onboarding_done', 'true');
-      router.replace('/register');
+      router.replace('/login');
     }
   };
 
@@ -70,7 +70,7 @@ export default function OnboardingScreen() {
       <View style={styles.skipRow}>
         <TouchableOpacity onPress={async () => {
           await AsyncStorage.setItem('onboarding_done', 'true');
-          router.replace('/register');
+          router.replace('/login');
         }}>
           <Text style={styles.skip}>Skip</Text>
         </TouchableOpacity>
